@@ -129,25 +129,7 @@ document.addEventListener("DOMContentLoaded", function () {
         // Remove trailing dot, if present
         simplified = simplified.replace(/\.$/, "");
 
-        // Split by dots
-        const parts = simplified.split(".");
-
-        // Handle invalid domains (less than 2 parts)
-        if (parts.length < 2) {
-            return "";
-        }
-
-        // Check for ccTLDs (2 parts) or TLDs with more than 2 characters
-        if (/^[a-z]{2,}$/.test(parts[parts.length - 1])) {
-            return parts.slice(-2).join(".");
-        }
-
-        // Handle wildcard subdomains (leading *)
-        if (parts[0] === "*") {
-            return parts.slice(1).join(".");
-        }
-
-        // Return last two parts for other formats
-        return parts.slice(-2).join(".");
+        // Return the simplified domain
+        return simplified;
     }
 });
