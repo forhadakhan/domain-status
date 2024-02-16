@@ -1,0 +1,68 @@
+:root {
+    --primary-color: green;
+    --secondary-color: red;
+    --input-width: 300px;
+    --button-padding: 10px 25px;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #eeeeee;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.container {
+    max-width: 600px;
+    margin: 50px auto;
+    flex: 1;
+    padding: 1rem;
+    text-align: center;
+}
+
+input[type="text"] {
+    width: var(--input-width);
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+button {
+    padding: var(--button-padding);
+    cursor: pointer;
+}
+
+a {
+    margin: 15px 5px;
+}
+
+footer {
+    color: gray;
+    font-size: small;
+    text-align: center;
+    position: sticky;
+    bottom: 0;
+    width: 100%;
+}
+
+footer p {
+    padding: 0 10px;
+}
+
+#positiveResult,
+#negativeResult {
+    margin-top: 20px;
+    font-weight: bold;
+}
+
+#positiveResult {
+    color: var(--primary-color);
+}
+
+#error {
+    font-weight: bold;
+    font-size: large;
+    color: var(--secondary-color);
+}
