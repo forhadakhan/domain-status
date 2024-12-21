@@ -36,6 +36,10 @@ button {
 
 a {
     margin: 15px 5px;
+    text-underline-offset: 0.3rem;
+}
+a:hover {
+    text-decoration: underline wavy blue;
 }
 
 footer {
@@ -49,6 +53,10 @@ footer {
 
 footer p {
     padding: 0 10px;
+}
+
+footer p a {
+    text-decoration: none;
 }
 
 #positiveResult,
