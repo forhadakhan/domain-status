@@ -1,86 +1,108 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>
-            Check Domain Status - Instantly Verify Domain Availability
-        </title>
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>
+			Check Domain Status - Instantly Verify Domain Availability
+		</title>
 
-        <!-- Meta tags for SEO -->
-        <meta
-            name="description"
-            content="Domain Status is your go-to web application for instantly checking the availability and registration status of domain names."
-        />
-        <meta
-            name="keywords"
-            content="domain, domain status, whois, lookup, detect domain, domain registration, check domain availability, discover domain"
-        />
-        <meta name="author" content="Forhad Khan" />
-        <meta name="robots" content="index, follow" />
-        <link rel="canonical" href="https://forhadakhan.com" />
+		<!-- Meta tags for SEO -->
+		<meta
+			name="description"
+			content="Domain Status is your go-to web application for instantly checking the availability and registration status of domain names."
+		/>
+		<meta
+			name="keywords"
+			content="domain, domain status, whois, lookup, detect domain, domain registration, check domain availability, discover domain"
+		/>
+		<meta name="author" content="Forhad Khan" />
+		<meta name="robots" content="index, follow" />
+		<link rel="canonical" href="https://forhadakhan.com" />
 
-        <!-- Link to external stylesheet -->
-        <link rel="stylesheet" href="styles.css?v=1.0" />
-        <link rel="icon" type="image/png" href="web.webp" />
+		<!-- Link to external stylesheet -->
+		<link rel="stylesheet" href="styles.css?v=1.0" />
+		<link rel="icon" type="image/png" href="web.webp" />
 
-        <!-- Defer loading of JavaScript for better performance -->
-        <script src="script.js?v=1.0" defer></script>
+		<!-- Defer loading of JavaScript for better performance -->
+		<script src="script.js?v=1.0" defer></script>
 
-        <!-- Structured data -->
-        <script type="application/ld+json">
-            {
-                "@context": "https://schema.org",
-                "@type": "WebApplication",
-                "name": "Domain Status",
-                "description": "Instantly check the availability and registration status of domain names.",
-                "url": "https://forhadakhan.com"
-            }
-        </script>
-    </head>
+		<!-- Structured data -->
+		<script type="application/ld+json">
+			{
+				"@context": "https://schema.org",
+				"@type": "WebApplication",
+				"name": "Domain Status",
+				"description": "Instantly check the availability and registration status of domain names.",
+				"url": "https://forhadakhan.com"
+			}
+		</script>
+	</head>
 
-    <body>
-        <header>
-            <h1 class="sr-only">
-                Domain Status: A user-friendly web application for instantly
-                verifying domain registration or availability status. The Domain
-                Status app's lightning-fast, free availability check lets you
-                effortlessly determine domain availability with ease through an
-                intuitive interface.
-            </h1>
-            <img src="globe.gif" alt="Domain Status Logo" class="no-peus" />
-            <h1>Domain Status</h1>
-        </header>
+	<body>
+		<header>
+			<h1 class="sr-only">
+				Domain Status: A user-friendly web application for instantly
+				verifying domain registration or availability status. The Domain
+				Status app's lightning-fast, free availability check lets you
+				effortlessly determine domain availability with ease through an
+				intuitive interface.
+			</h1>
 
-        <main>
-            <form id="domainForm" autocomplete="off">
-                <input
-                    type="text"
-                    id="domainInput"
-                    placeholder="Enter domain name"
-                />
-                <div>
-                    <button type="submit">check</button>
-                    <a href="#" id="clearButton">clear</a>
-                    <a href="#" id="pasteButton">paste</a>
-                </div>
-            </form>
-            <br />
-            <p id="positiveResult"></p>
-            <p id="negativeResult"></p>
-            <p id="error"></p>
-        </main>
+			<img src="globe.gif" alt="Domain Status Logo" class="no-peus" />
 
-        <footer>
-            <p>
-                A domain may be available for registration if it is 
-                NOT DETECTED.
-            </p>
-            <p>
-                <a href="https://forhadakhan.com" target="_blank">FORHAD KHAN</a>
-                |
-                <a href="https://github.com/forhadakhan" target="_blank">@forhadakhan</a>
-            </p>
-        </footer>
-    </body>
+			<h2 class="heading">Domain Status</h2>
+		</header>
+
+		<main>
+			<form id="domainForm" autocomplete="off">
+				<input
+					type="text"
+					id="domainInput"
+					placeholder="Enter domain name"
+				/>
+				<div>
+					<button type="submit">check</button>
+					<a href="#" id="clearButton" class="space-gap">clear</a>
+					<a href="#" id="pasteButton">paste</a>
+				</div>
+			</form>
+			<br />
+			<p id="positiveResult"></p>
+			<p id="negativeResult"></p>
+			<p id="error"></p>
+		</main>
+
+		<footer>
+			<small class="footer">
+				A domain may still be unavailable for registration even if no
+				<a
+					href="https://en.wikipedia.org/wiki/DNS_record"
+					target="_blank"
+					nofollow
+					noopener
+					>DNS</a
+				>
+				record is found.
+				<a
+					href="https://www.icann.org/resources/pages/domain-name-registration-process-2023-11-02-en"
+					target="_blank"
+					nofollow
+					noopener
+					>Learn more.</a
+				>
+			</small>
+			<div class="space-gap-sm"></div>
+			<small class="footer">
+				©
+				<a href="https://forhadakhan.com" target="_blank"
+					>FORHAD KHAN</a
+				>
+				|
+				<a href="https://github.com/forhadakhan" target="_blank"
+					>@forhadakhan</a
+				>
+			</small>
+		</footer>
+	</body>
 </html>

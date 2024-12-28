@@ -1,166 +1,246 @@
 document.addEventListener("DOMContentLoaded", function () {
-  const domainForm = document.getElementById("domainForm");
-  const domainInput = document.getElementById("domainInput");
-  const clearButton = document.getElementById("clearButton");
-  const pasteButton = document.getElementById("pasteButton");
-  const positiveResult = document.getElementById("positiveResult");
-  const negativeResult = document.getElementById("negativeResult");
-  const errorParagraph = document.getElementById("error");
+	const domainForm = document.getElementById("domainForm");
+	const domainInput = document.getElementById("domainInput");
+	const clearButton = document.getElementById("clearButton");
+	const pasteButton = document.getElementById("pasteButton");
+	const positiveResult = document.getElementById("positiveResult");
+	const negativeResult = document.getElementById("negativeResult");
+	const errorParagraph = document.getElementById("error");
 
-  // Define icon
-  const exclamationIcon = `
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-exclamation-triangle" viewBox="0 0 16 16">
-            <path d="M7.938 2.016A.13.13 0 0 1 8.002 2a.13.13 0 0 1 .063.016.15.15 0 0 1 .054.057l6.857 11.667c.036.06.035.124.002.183a.2.2 0 0 1-.054.06.1.1 0 0 1-.066.017H1.146a.1.1 0 0 1-.066-.017.2.2 0 0 1-.054-.06.18.18 0 0 1 .002-.183L7.884 2.073a.15.15 0 0 1 .054-.057m1.044-.45a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767z"/>
-            <path d="M7.002 12a1 1 0 1 1 2 0 1 1 0 0 1-2 0M7.1 5.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0z"/>
-        </svg>
-    `;
+	// Function to display error message
+	function displayError(message) {
+		errorParagraph.innerHTML = message; // Set error message text
+	}
 
-  // Function to handle form submission
-  function handleFormSubmit(event) {
-    event.preventDefault(); // Prevent default form submission behavior
-    const input = domainInput.value.trim(); // Get input value and trim whitespace
-    const domain = simplifyDomain(input); // Simplify the domain name
+	function validateDomain(domain) {
+		if (domain === "" || domain === null || !domain.includes(".")) {
+			displayError(`ERROR: Invalid input.`);
+			return false;
+		}
 
-    if (domain === "") {
-      displayError(`${exclamationIcon} Invalid input.`); // Display error message
-      return;
-    }
+		if (/[^a-zA-Z0-9.-]/.test(domain)) {
+			displayError(
+				`ERROR: A domain can only contain letters, numbers, dots, and hyphens.`
+			);
+			return false;
+		}
 
-    // Check if the domain is registered
-    isDomainRegistered(domain)
-      .then((isRegistered) => {
-        if (isRegistered) {
-          positiveResult.textContent = `The domain '${domain}' is REGISTERED.`;
-          negativeResult.textContent = ""; // Clear negative result
-        } else {
-          negativeResult.textContent = `The domain '${domain}' is NOT DETECTED.`;
-          positiveResult.textContent = ""; // Clear positive result
-        }
-        clearError(); // Clear any previous error message
-      })
-      .catch((err) => {
-        console.error("Error:", err);
-        displayError(`${exclamationIcon} An error occurred. Please try again.`); // Display error message
-      });
-  }
+		if (domain.includes("..")) {
+			displayError(`ERROR: A domain cannot contain consecutive dots.`);
+			return false;
+		}
 
-  // Add event listener for form submission
-  domainForm.addEventListener("submit", handleFormSubmit);
+		if (domain.startsWith("-") || domain.endsWith("-")) {
+			displayError(`ERROR: A domain cannot start or end with a hyphen.`);
+			return false;
+		}
 
-  // Function to display error message
-  function displayError(message) {
-    errorParagraph.innerHTML = message; // Set error message text
-  }
+		const parts = domain.split(".");
+		if (
+			parts.length < 2 ||
+			parts[0].length < 1 ||
+			parts[parts.length - 1].length < 2
+		) {
+			displayError(
+				`ERROR: A valid domain must have at least one character before the dot and two characters after.`
+			);
+			return false;
+		}
 
-  // Function to clear error message
-  function clearError() {
-    errorParagraph.textContent = ""; // Clear error message
-  }
+		const tld = parts.pop();
+		if (!/^[a-zA-Z]+$/.test(tld)) {
+			displayError(
+				`ERROR: The top-level domain (TLD) must contain only letters (e.g., .com, .org).`
+			);
+			return false;
+		}
 
-  // Function to handle clearing the input field
-  clearButton.addEventListener("click", function (event) {
-    event.preventDefault(); // Prevent default link behavior
-    domainInput.value = ""; // Clear the input field
-    clearError(); // Clear any previous error message
-    clearResults(); // Clear any previous results
-  });
+		if (domain.length > 253 || parts.some((part) => part.length > 63)) {
+			displayError(
+				`ERROR: A domain cannot exceed 253 characters, and each section cannot exceed 63 characters.`
+			);
+			return false;
+		}
 
-  // Function to handle pasting text from clipboard
-  pasteButton.addEventListener("click", function (event) {
-    event.preventDefault(); // Prevent default link behavior
-    navigator.clipboard
-      .readText() // Read text from clipboard
-      .then((text) => {
-        domainInput.value = text; // Paste text into input field
-        clearError(); // Clear any previous error message
-        clearResults(); // Clear any previous results
-      })
-      .catch((err) => {
-        console.error("Error reading from clipboard:", err);
-      });
-  });
+		const reservedDomains = ["example.com", "localhost", "test"];
+		if (
+			reservedDomains.includes(domain.toLowerCase()) ||
+			/^(?:\d{1,3}\.){3}\d{1,3}$/.test(domain)
+		) {
+			displayError(
+				`ERROR: The input cannot be a reserved domain or an IP address.`
+			);
+			return false;
+		}
 
-  // Function to clear both positive and negative results
-  function clearResults() {
-    positiveResult.textContent = "";
-    negativeResult.textContent = "";
-  }
+		return true;
+	}
 
-  // Function to check if the domain is registered
-  function isDomainRegistered(domain) {
-    return new Promise((resolve, reject) => {
-      const checkWithGoogleDNS = () => {
-        const xhr = new XMLHttpRequest();
-        xhr.open(
-          "GET",
-          `https://dns.google.com/resolve?name=${domain}&type=A`,
-          true
-        );
-        xhr.onreadystatechange = function () {
-          if (xhr.readyState === 4) {
-            if (xhr.status === 200) {
-              const response = JSON.parse(xhr.responseText);
-              if (response.Answer && response.Answer.length > 0) {
-                resolve(true); // Domain is registered
-              } else {
-                // If not found, recheck with Cloudflare DNS
-                checkWithCloudflareDNS();
-              }
-            } else {
-              reject(new Error("Failed to fetch DNS information from Google."));
-            }
-          }
-        };
-        xhr.send();
-      };
+	// Function to simplify the domain name
+	function simplifyDomain(input) {
+		// Remove protocol and www prefix if present
+		let simplified = input
+			.trim()
+			.replace(/^https?:\/\//, "")
+			.replace("www.", "");
 
-      const checkWithCloudflareDNS = () => {
-        const xhr = new XMLHttpRequest();
-        xhr.open(
-          "GET",
-          `https://cloudflare-dns.com/dns-query?name=${domain}&type=A`,
-          true
-        );
-        xhr.setRequestHeader("Accept", "application/dns-json");
-        xhr.onreadystatechange = function () {
-          if (xhr.readyState === 4) {
-            if (xhr.status === 200) {
-              const response = JSON.parse(xhr.responseText);
-              if (response.Answer && response.Answer.length > 0) {
-                resolve(true); // Domain is registered
-              } else {
-                resolve(false); // Domain not registered
-              }
-            } else {
-              reject(
-                new Error("Failed to fetch DNS information from Cloudflare.")
-              );
-            }
-          }
-        };
-        xhr.send();
-      };
+		// Remove anything after the main domain if there's a slash
+		simplified = simplified.split("/")[0];
 
-      // Start with Google DNS
-      checkWithGoogleDNS();
-    });
-  }
+		// Remove trailing dot, if present
+		simplified = simplified.replace(/\.$/, "");
 
-  // Function to simplify the domain name
-  function simplifyDomain(input) {
-    // Remove protocol and www prefix if present
-    let simplified = input
-      .trim()
-      .replace(/^https?:\/\//, "")
-      .replace("www.", "");
+		// Return the simplified domain
+		return simplified;
+	}
 
-    // Remove anything after the main domain if there's a slash
-    simplified = simplified.split("/")[0];
+	// Function to handle form submission
+	function handleFormSubmit(event) {
+		event.preventDefault(); // Prevent default form submission behavior
+		clearError(); // Clear any previous error message
+		clearResults(); // Clear any previous results
+		const input = domainInput.value.trim(); // Get input value and trim whitespace
+		const domain = simplifyDomain(input); // Simplify the domain name
 
-    // Remove trailing dot, if present
-    simplified = simplified.replace(/\.$/, "");
+		// Check if the domain is valid
+		if (!validateDomain(domain)) {
+			return; // Stop execution if validation fails
+		}
 
-    // Return the simplified domain
-    return simplified;
-  }
+		// Check if the domain is registered
+		isDomainRegistered(domain)
+			.then((isRegistered) => {
+				if (isRegistered) {
+					positiveResult.textContent = `REGISTERED: A dns record was found for '${domain}'.`;
+					negativeResult.textContent = ""; // Clear negative result
+				} else {
+					negativeResult.textContent = `UNREGISTERED: No dns record was found for '${domain}'.`;
+					positiveResult.textContent = ""; // Clear positive result
+				}
+				clearError(); // Clear any previous error message
+			})
+			.catch((err) => {
+				console.error("Error:", err);
+				displayError(`ERROR: An error occurred. Please try again.`); // Display error message
+			});
+	}
+
+	// Add event listener for form submission
+	domainForm.addEventListener("submit", handleFormSubmit);
+
+	// Function to clear error message
+	function clearError() {
+		errorParagraph.textContent = ""; // Clear error message
+	}
+
+	// Function to handle clearing the input field
+	clearButton.addEventListener("click", function (event) {
+		event.preventDefault(); // Prevent default link behavior
+		domainInput.value = ""; // Clear the input field
+		clearError(); // Clear any previous error message
+		clearResults(); // Clear any previous results
+	});
+
+	// Function to handle pasting text from clipboard
+	pasteButton.addEventListener("click", function (event) {
+		event.preventDefault(); // Prevent default link behavior
+		navigator.clipboard
+			.readText() // Read text from clipboard
+			.then((text) => {
+				domainInput.value = text; // Paste text into input field
+				clearError(); // Clear any previous error message
+				clearResults(); // Clear any previous results
+			})
+			.catch((err) => {
+				console.error("Error reading from clipboard:", err);
+			});
+	});
+
+	// Function to clear both positive and negative results
+	function clearResults() {
+		positiveResult.textContent = "";
+		negativeResult.textContent = "";
+	}
+
+	// Function to check if the domain is registered
+	function isDomainRegistered(domain) {
+		return new Promise((resolve, reject) => {
+			const checkWithGoogleDNS = () => {
+				const xhr = new XMLHttpRequest();
+				xhr.open(
+					"GET",
+					`https://dns.google.com/resolve?name=${domain}&type=A`,
+					true
+				);
+				xhr.onreadystatechange = function () {
+					if (xhr.readyState === 4) {
+						if (xhr.status === 200) {
+							const response = JSON.parse(xhr.responseText);
+							if (response.Answer && response.Answer.length > 0) {
+								resolve(true); // Domain is registered
+							} else {
+								// If not found, recheck with Cloudflare DNS
+								checkWithCloudflareDNS();
+							}
+						} else {
+							reject(
+								new Error(
+									"Failed to fetch DNS information from Google."
+								)
+							);
+						}
+					}
+				};
+				xhr.send();
+			};
+
+			const checkWithCloudflareDNS = () => {
+				const xhr = new XMLHttpRequest();
+				xhr.open(
+					"GET",
+					`https://cloudflare-dns.com/dns-query?name=${domain}&type=A`,
+					true
+				);
+				xhr.setRequestHeader("Accept", "application/dns-json");
+				xhr.onreadystatechange = function () {
+					if (xhr.readyState === 4) {
+						if (xhr.status === 200) {
+							const response = JSON.parse(xhr.responseText);
+							if (response.Answer && response.Answer.length > 0) {
+								resolve(true); // Domain is registered
+							} else {
+								resolve(false); // Domain not registered
+							}
+						} else {
+							reject(
+								new Error(
+									"Failed to fetch DNS information from Cloudflare."
+								)
+							);
+						}
+					}
+				};
+				xhr.send();
+			};
+
+			// Start with Google DNS
+			checkWithGoogleDNS();
+		});
+	}
+});
+
+// Focus the input field when the page loads
+document.addEventListener("DOMContentLoaded", () => {
+	const domainInput = document.getElementById("domainInput");
+
+	// Automatically focus the input field when the page loads
+	domainInput.focus();
+
+	// Add an event listener to the document to detect typing
+	document.addEventListener("keydown", (event) => {
+		// Check if the input is not focused
+		if (document.activeElement !== domainInput) {
+			domainInput.focus();
+		}
+	});
 });
